@@ -44,4 +44,33 @@ public class ViewUtils {
         result.bottom = result.top + child.getMeasuredHeight();
         return result;
     }
+    
+       /**
+     * Rect在屏幕上去掉状态栏高度的绝对位置
+     */
+    public static Rect getViewAbsRect(Activity activity, View view) {
+        ViewGroup content = (ViewGroup) activity.findViewById(android.R.id.content);
+        int parentX = 0;
+        int parentY;
+        final int[] loc = new int[2];
+        content.getLocationInWindow(loc);
+        parentY = loc[1];//通知栏的高度
+        if (parentY == 0) {
+            Class<?> localClass;
+            try {
+                localClass = Class.forName("com.android.internal.R$dimen");
+                Object localObject = localClass.newInstance();
+                int i5 = Integer.parseInt(localClass.getField("status_bar_height").get(localObject).toString());
+                parentY = activity.getResources().getDimensionPixelSize(i5);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        view.getLocationInWindow(loc);
+        Rect rect = new Rect();
+        rect.set(loc[0], loc[1], loc[0] + view.getMeasuredWidth(), loc[1] + view.getMeasuredHeight());
+        rect.offset(-parentX, -parentY);
+        return rect;
+    }
 }
